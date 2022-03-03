@@ -28,7 +28,7 @@ namespace ePollApi
             }
         }
 
-        public static void SavePoll(PollPost poll)
+        public static PollWithOptions SavePoll(PollPost poll)
         {
             using (SQLiteConnection cnn = new SQLiteConnection("Data Source=./pollDb.db"))
             {
@@ -41,7 +41,12 @@ namespace ePollApi
                 {
                     cnn.Execute("INSERT INTO OPTION (TITLE,VOTES,POLLID) VALUES (@title,@votes,@pollid)", new { title, votes=0, pollid=newId });
                 }
+
+                var outputPoll = cnn.Query<Poll>("SELECT * FROM POLL WHERE POLL.ID = @pollId", new { pollId=newId });
+                var outputOptions = cnn.Query<Option>("SELECT * FROM OPTION WHERE OPTION.POLLID = @pollId", new { pollId=newId });
+                var pwo = new PollWithOptions { Id = newId, Title = outputPoll.First().Title, Options = outputOptions.ToList() };
                 cnn.Close();
+                return pwo;
             }
         }
 

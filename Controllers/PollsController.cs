@@ -41,9 +41,10 @@ namespace ePollApi.Controllers
         // POST: Add poll
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public void AddPoll([FromBody] PollPost pollToPost)
+        public async Task<ActionResult<PollWithOptions>> AddPoll([FromBody] PollPost pollToPost)
         {
-            SqliteDataAccess.SavePoll(pollToPost);
+            var pwo = SqliteDataAccess.SavePoll(pollToPost);
+            return pwo;
         }
     }
 }
